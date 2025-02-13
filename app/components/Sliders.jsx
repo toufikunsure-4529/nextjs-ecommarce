@@ -25,7 +25,7 @@ const heroSlides = [
     }
 ];
 
-export default function HeroSectionSlider() {
+export default function HeroSectionSlider({ featuredProducts }) {
     const settings = {
         dots: true,
         infinite: true,
@@ -40,16 +40,16 @@ export default function HeroSectionSlider() {
     return (
         <div className="relative w-full h-screen bg-gray-900">
             <Slider {...settings}>
-                {heroSlides.map((slide) => (
-                    <div key={slide.id} className="relative w-full h-screen">
+                {featuredProducts.map((product) => (
+                    <div key={product.id} className="relative w-full h-screen">
                         <img
-                            src={slide.image}
-                            alt={slide.title}
+                            src={product.image}
+                            alt={product.title}
                             className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 text-white text-center p-4">
-                            <h1 className="text-4xl md:text-6xl font-bold">{slide.title}</h1>
-                            <p className="text-lg md:text-2xl mt-4">{slide.subtitle}</p>
+                            <h1 className="text-4xl md:text-6xl font-bold">{product.title}</h1>
+                            <p className="text-lg md:text-2xl mt-4">{product.subtitle}</p>
                         </div>
                     </div>
                 ))}
