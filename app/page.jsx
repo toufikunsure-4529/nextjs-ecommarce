@@ -1,22 +1,40 @@
 import Image from "next/image";
 import HeroSection from "./components/HeroSection";
 import Header from "./components/Header";
-import ProductCard from "./components/ProductCard";
 import FeaturedProductSlider from "./components/Sliders";
-import { getFeaturedProducts } from "@/lib/firestore/products/read_server";
+import { getFeaturedProducts, getProducts } from "@/lib/firestore/products/read_server";
+import Collections from "./components/Collections";
+import { getCollections } from "@/lib/firestore/collections/read_server";
+import Categories from "./components/Categories";
+import { getCategories } from "@/lib/firestore/categories/read_server";
+import ProductsGridView from "./components/Products";
+import CustomerReviews from "./components/CustomerReviews";
+import Brands from "./components/Brands";
+import { getBrands } from "@/lib/firestore/brands/read_server";
+import Footer from "./components/Footer";
 
 export default async function Home() {
-  const featuredProducts = await getFeaturedProducts()
+  // fetch  data from firestore 
+  const [featuredProducts, collections, categories, products, brands] = await Promise.all([
+    getFeaturedProducts(),
+    getCollections(),
+    getCategories(),
+    getProducts(),
+    getBrands(),
+  ]);
+
 
   return (
     <>
       <Header />
-      <main className="py-10">
-        <div className="mb-10">
-          <FeaturedProductSlider featuredProducts={featuredProducts} />
-        </div>
-
-        <h1>E-commarce</h1>
+      <main >
+        <FeaturedProductSlider featuredProducts={featuredProducts} />
+        <Collections collections={collections} />
+        <Categories categories={categories} />
+        <ProductsGridView products={products} />
+        <CustomerReviews />
+        <Brands brands={brands} />
+        <Footer />
       </main>
     </>
   );
