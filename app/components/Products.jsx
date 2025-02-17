@@ -4,6 +4,9 @@ import { Rating } from "@mui/material";
 import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import FavoriteButton from "./FavoriteButton";
+import { AuthContextProvider } from "@/context/AuthContext";
+import AddToCartButton from "./AddToCartButton";
 
 function ProductsGridView({ products }) {
     const mockProducts = [
@@ -83,9 +86,12 @@ export function ProductCard({ product }) {
                     alt={product.title}
                     className="w-full h-48 object-cover object-center"
                 />
-                <button className="absolute top-2 right-2 bg-white border border-gray-300 p-2 rounded-full shadow-md hover:bg-red-500 hover:text-white text-gray-600 transition-all">
-                    <Heart size={16} />
-                </button>
+                <div className="absolute top-1 right-1">
+                    <AuthContextProvider>
+
+                        <FavoriteButton productId={product?.id} />
+                    </AuthContextProvider>
+                </div>
             </div>
             <div className="p-4 flex flex-col flex-grow gap-2">
                 <Link href={`/products/${product?.id}`}><h3 className="text-base font-semibold text-gray-900 line-clamp-2 hover:text-blue-500 transition-colors delay-100">{product.title}</h3>
@@ -101,12 +107,18 @@ export function ProductCard({ product }) {
                 </Link>
 
                 <div className="flex justify-between gap-3 mt-auto">
-                    <button className="bg-blue-500 text-white flex-1 py-2 text-sm font-medium rounded-lg transition hover:bg-blue-600 shadow-md">
-                        Buy Now
-                    </button>
-                    <button className="bg-gray-100 text-gray-700 p-2 rounded-lg transition hover:bg-gray-200 shadow-md">
+                    <Link href={`/checkout?type=buynow&productId=${product?.id}`}>
+                        <button className="bg-blue-500 text-white flex-1 py-2 text-sm font-medium rounded-lg transition hover:bg-blue-600 shadow-md">
+                            Buy Now
+                        </button>
+                    </Link>
+                    {/* <button className="bg-gray-100 text-gray-700 p-2 rounded-lg transition hover:bg-gray-200 shadow-md">
                         <ShoppingCart className="w-5 h-5" />
-                    </button>
+                    </button> */}
+                    <AuthContextProvider>
+                        <AddToCartButton productId={product?.id} />
+
+                    </AuthContextProvider>
                 </div>
             </div>
         </div>

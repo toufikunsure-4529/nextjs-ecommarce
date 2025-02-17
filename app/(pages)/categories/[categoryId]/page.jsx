@@ -1,7 +1,7 @@
 import { ProductCard } from '@/app/components/Products';
 import { getCategory } from '@/lib/firestore/categories/read_server';
 import { getProductsByCategory } from '@/lib/firestore/products/read_server';
-import React from 'react'
+
 
 async function page({ params }) {
     const { categoryId } = params;

@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+;
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Bell, Menu, ShoppingCart, Package, Users, DollarSign } from 'lucide-react';
 

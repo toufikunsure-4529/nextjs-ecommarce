@@ -1,5 +1,5 @@
 import { getProduct } from '@/lib/firestore/products/read_server';
-import React from 'react';
+;
 import Photos from './components/Photos';
 import Details from './components/Details';
 import Description from './components/Description';

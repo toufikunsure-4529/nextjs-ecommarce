@@ -5,6 +5,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import FavoriteButton from "./FavoriteButton";
+import { AuthContextProvider } from "@/context/AuthContext";
+import AddToCartButton from "./AddToCartButton";
 
 const heroSlides = [
     {
@@ -57,17 +60,19 @@ export default function HeroSectionSlider() {
                                 <p className="text-gray-600 text-sm md:text-base max-w-md mx-auto md:mx-0">
                                     {product.shortDescription}
                                 </p>
-                                <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-md text-sm md:text-base transition">
-                                        Buy Now
-                                    </button>
-                                    <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md text-sm md:text-base transition">
-                                        Add to Cart
-                                    </button>
-                                    <button className="border border-pink-400 text-pink-500 hover:bg-pink-50 px-4 py-2 rounded-md flex items-center gap-1 transition">
-                                        <Heart size={18} />
-                                    </button>
-                                </div>
+                                <AuthContextProvider>
+                                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                        <Link href={`/checkout?type=buynow&productId=${product?.id}`}>
+                                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-md text-sm md:text-base transition">
+                                                Buy Now
+                                            </button>
+                                        </Link>
+                                        <AddToCartButton productId={product?.id} type={'large'} />
+
+                                        <FavoriteButton productId={product?.id} />
+
+                                    </div>
+                                </AuthContextProvider>
                             </div>
                             <div className="flex justify-center">
                                 <Link href={`/products/${product.id}`}>
@@ -76,8 +81,9 @@ export default function HeroSectionSlider() {
                             </div>
                         </div>
                     </div>
-                ))}
-            </Slider>
+                ))
+                }
+            </Slider >
             <style jsx global>{`
                 .slick-dots {
                     bottom: 10px !important;
@@ -87,9 +93,9 @@ export default function HeroSectionSlider() {
                     font-size: 12px !important;
                 }
                 .slick-dots li.slick-active button:before {
-                    color: #ECD645 !important;
+                    color: #2563EB !important;
                 }
             `}</style>
-        </div>
+        </div >
     );
 }

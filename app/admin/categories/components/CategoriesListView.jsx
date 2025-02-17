@@ -1,4 +1,4 @@
-import React from 'react';
+;
 import { Trash2, Edit2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 

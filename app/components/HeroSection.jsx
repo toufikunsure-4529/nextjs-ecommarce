@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React from 'react';
+;
 import banner from '@/public/banner.jpg';
 
 function HeroSection() {

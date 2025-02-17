@@ -2,6 +2,8 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase';
+import { CircularProgress } from '@mui/material';
+import { Button } from '@nextui-org/react';
 import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
@@ -18,7 +20,7 @@ export default function Login() {
   const router = useRouter()
   useEffect(() => {
     if (user) {
-      router.push("/dashboard")
+      router.push("/account")
     }
   }, [user])
   const {
@@ -113,12 +115,17 @@ function SignInWithGoogleComponents() {
     setIsLoading(false)
   }
 
-  return (<button
+  return (<Button
     type="button"
-    className="w-full flex items-center justify-center border  py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-200 transition-all shadow-md"
+    className={`w-full flex items-center justify-center border  py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-200 transition-all shadow-md ${loading ? "bg-gray-200 cursor-not-allowed" : ""}`}
     onClick={handleLogin}
     disabled={loading}
+
   >
+
     <FcGoogle className="text-2xl mr-2" /> Sign in with Google
-  </button>)
+    {loading && <CircularProgress size={20} thickness={7} color="primary" />
+    }
+
+  </Button>)
 }

@@ -1,6 +1,6 @@
 import { ProductCard } from '@/app/components/Products';
 import { getProductsByCategory } from '@/lib/firestore/products/read_server'
-import React from 'react'
+
 
 async function RelatedProducts({ categoryId }) {
     const mockProducts = [
