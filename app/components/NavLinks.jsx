@@ -1,7 +1,8 @@
-// components/NavLinks.js (Server Component)
+"use client"; // Ensure it's a client component
+
 import Link from "next/link";
 
-const NavLinks = () => {
+const NavLinks = ({ isMobile = false }) => {
     const menuList = [
         { name: "Home", link: "/" },
         { name: "About", link: "/about" },
@@ -9,7 +10,7 @@ const NavLinks = () => {
     ];
 
     return (
-        <nav className="hidden md:flex gap-8">
+        <nav className={`${isMobile ? "flex flex-col gap-4" : "hidden md:flex gap-8"}`}>
             {menuList.map((menu) => (
                 <Link
                     key={menu.name}

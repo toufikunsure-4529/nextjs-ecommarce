@@ -10,14 +10,13 @@ import toast from "react-hot-toast";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import LogoutButton from "./LogoutButton";
-import { AuthContextProvider } from "@/context/AuthContext";
+import { AuthContextProvider, useAuth } from "@/context/AuthContext";
 import HeaderClientButton from "./HeaderClientButton";
 import NavLinks from "./NavLinks"; // Import the server component
 
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const isLoggedIn = true;
-
+    const isLoggedIn = true
     const handleLogout = async () => {
         try {
             await toast.promise(signOut(auth), {
@@ -33,7 +32,7 @@ const Header = () => {
     return (
         <header className="bg-white bg-opacity-65 backdrop-blur-2xl shadow-md fixed w-full top-0 z-[999] border-b border-gray-200">
             <div className="container mx-auto md:px-6 px-3 py-3 flex items-center justify-between">
-                
+
                 {/* Logo */}
                 <Link href="/" className="flex items-center text-2xl font-bold text-gray-900">
                     <Image src="/logo.webp" alt="Logo" width={120} height={50} unoptimized />
@@ -88,25 +87,29 @@ const Header = () => {
             </div>
 
             {/* Mobile Menu (Client-Side for Interactivity) */}
-            <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: menuOpen ? "100vh" : 0, opacity: menuOpen ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className={`md:hidden bg-white shadow-md absolute w-full left-0 top-full flex flex-col items-center justify-center gap-5 p-8 border-t border-gray-200 overflow-hidden`}
-            >
-                {/* Use Server Component for Menu Links */}
-                <NavLinks />
-                
-                {isLoggedIn ? (
-                    <AuthContextProvider>
-                        <LogoutButton />
-                    </AuthContextProvider>
-                ) : (
-                    <Link href="/login" className="text-gray-700 hover:text-blue-600 font-medium transition mt-2 text-lg">
-                        Login
-                    </Link>
-                )}
-            </motion.div>
+            {menuOpen && (
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "100vh", opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="md:hidden bg-white shadow-md absolute w-full left-0 top-full flex flex-col items-center justify-center gap-5 p-8 border-t border-gray-200 overflow-hidden"
+                >
+
+                    {/* Mobile Navigation Links */}
+                    <NavLinks isMobile={true} />
+
+                    {/* Mobile Authentication Actions */}
+                    {isLoggedIn ? (
+                        <AuthContextProvider>
+                            <LogoutButton />
+                        </AuthContextProvider>
+                    ) : (
+                        <Link href="/login" className=" bg-black px-6 py-2 rounded text-white hover:text-gray-600 font-medium transition mt-2 text-lg">
+                            Login
+                        </Link>
+                    )}
+                </motion.div>
+            )}
         </header>
     );
 };

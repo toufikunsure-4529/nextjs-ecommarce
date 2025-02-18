@@ -12,9 +12,8 @@ function layout({ children }) {
             <Header />
             <AuthContextProvider>
                 <UserChecking>
-                    <section className='h-screen mt-20'>
-                        {children}
-                    </section>
+                    <section className="min-h-screen mt-20">{children}</section>
+
                 </UserChecking>
 
             </AuthContextProvider>

@@ -12,6 +12,7 @@ import CustomerReviews from "./components/CustomerReviews";
 import Brands from "./components/Brands";
 import { getBrands } from "@/lib/firestore/brands/read_server";
 import Footer from "./components/Footer";
+import { AuthContextProvider } from "@/context/AuthContext";
 
 export default async function Home() {
   // fetch  data from firestore 
@@ -26,8 +27,9 @@ export default async function Home() {
 
   return (
     <>
-      <Header />
-      <main >
+      <main className="w-screen h-screen overflow-x-hidden overflow-y-auto">
+        <Header />
+
         <FeaturedProductSlider featuredProducts={featuredProducts} />
         <Collections collections={collections} />
         <Categories categories={categories} />
