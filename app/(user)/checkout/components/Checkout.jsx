@@ -5,6 +5,7 @@ import {
 
     createCheckoutCODAndGetId,
 } from "@/lib/firestore/checkout/write";
+import { CircularProgress } from "@mui/material";
 import { Button } from "@nextui-org/react";
 import confetti from "canvas-confetti";
 import { CheckSquare2Icon, Square } from "lucide-react";
@@ -59,6 +60,15 @@ export default function Checkout({ productList }) {
         }
         setIsLoading(false);
     };
+
+    if (isLoading) {
+        return (
+            <div className="h-screen w-full flex flex-col justify-center items-center bg-gray-100">
+                <CircularProgress size={50} thickness={4} color="primary" />
+                <p className="mt-4 text-gray-600 font-medium">Please Wait...</p>
+            </div>
+        );
+    }
 
     return (
         <section className="flex flex-col md:flex-row  gap-3">
@@ -172,7 +182,7 @@ export default function Checkout({ productList }) {
                     <div className="flex flex-col gap-2">
                         {productList?.map((item) => {
                             return (
-                                <div className="flex gap-3 items-center">
+                                <div className="flex gap-3 items-center" key={item?.product?.title}>
                                     <img
                                         className="w-10 h-10 object-cover rounded-lg"
                                         src={item?.product?.featureImageURL}
