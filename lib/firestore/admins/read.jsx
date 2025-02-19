@@ -23,15 +23,15 @@ export function useAdmins() {
   return { data, error: error?.message || null, isLoading: data === undefined };
 }
 
+
 export function useAdmin({ email } = {}) {
-  if (!email) {
-    return { data: null, error: "Email is required", isLoading: false };
-  }
+  // Always define error and loading states
+  const isEmailValid = Boolean(email);
 
   const { data, error } = useSWRSubscription(
-    ["admins", email],
+    isEmailValid ? ["admins", email] : null, // Prevent SWR from running if email is missing
     ([_, email], { next }) => {
-      const ref = doc(db, "admins", email); // Correct Firestore doc path
+      const ref = doc(db, "admins", email);
       const unsubscribe = onSnapshot(
         ref,
         (snapshot) => {
@@ -44,5 +44,9 @@ export function useAdmin({ email } = {}) {
     }
   );
 
-  return { data, error: error?.message || null, isLoading: data === undefined };
+  return {
+    data: isEmailValid ? data : null,
+    error: isEmailValid ? error?.message || null : "Email is required",
+    isLoading: isEmailValid ? data === undefined : false,
+  };
 }

@@ -2,7 +2,8 @@
 
 import { useAdmins } from "@/lib/firestore/admins/read";
 import { deleteAdmin } from "@/lib/firestore/admins/write";
-import { Button, CircularProgress } from "@nextui-org/react";
+import { CircularProgress } from "@mui/material";
+import { Button } from "@nextui-org/react";
 import { Edit2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -11,14 +12,16 @@ import toast from "react-hot-toast";
 export default function ListView() {
   const { data: admins, error, isLoading } = useAdmins();
 
+
   if (isLoading) {
     return (
-      <div>
-        <CircularProgress />
-        <h2>Loading...</h2>
+      <div className="h-screen w-full flex flex-col justify-center items-center bg-gray-100">
+        <CircularProgress size={50} thickness={4} color="primary" />
+        <p className="mt-4 text-gray-600 font-medium">Checking authentication...</p>
       </div>
     );
   }
+
   { error && <div className="text-red-500">Error: {error.message}</div> }
 
   return (

@@ -37,6 +37,7 @@ const processOrder = async ({ checkout }) => {
 
   const productList = checkout?.line_items?.map((item, index) => {
     return {
+      key: item.id,
       productId: item?.price_data?.product_data?.metadata?.productId,
       quantity: item?.quantity,
     };

@@ -24,6 +24,8 @@ export default async function Home() {
     getBrands(),
   ]);
 
+  
+
 
   return (
     <>

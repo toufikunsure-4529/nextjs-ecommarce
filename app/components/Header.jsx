@@ -13,6 +13,7 @@ import LogoutButton from "./LogoutButton";
 import { AuthContextProvider, useAuth } from "@/context/AuthContext";
 import HeaderClientButton from "./HeaderClientButton";
 import NavLinks from "./NavLinks"; // Import the server component
+import AdminButton from "./AdminButton";
 
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -41,8 +42,12 @@ const Header = () => {
                 {/* Navigation Links (Server-Side) */}
                 <NavLinks />
 
+
                 {/* Right Section (Icons) */}
                 <div className="flex items-center md:gap-5 gap-3">
+                    <AuthContextProvider>
+                        <AdminButton />
+                    </AuthContextProvider>
                     <Link href={"/search"}>
                         <button title="Search Product">
                             <Search className="w-5 md:h-5 h-4 cursor-pointer text-gray-700 hover:text-blue-600 transition" />
@@ -60,9 +65,12 @@ const Header = () => {
                                     <User className="w-5 md:h-5 h-4" />
                                 </Button>
                             </DropdownTrigger>
-                            <DropdownMenu aria-label="Profile Actions" className="bg-white shadow-md border rounded-md">
-                                <DropdownItem key="profile">
+                            <DropdownMenu aria-label="Profile Actions" className="bg-white shadow-md border rounded-md w-28">
+                                <DropdownItem key="account">
                                     <Link href="/account" className="block text-gray-700 hover:text-blue-600">Profile</Link>
+                                </DropdownItem>
+                                <DropdownItem key="profile">
+                                    <Link href="/account" className="block text-gray-700 hover:text-blue-600">Orders</Link>
                                 </DropdownItem>
                                 <DropdownItem key="logout" className="text-red-600 hover:text-red-800">
                                     <AuthContextProvider>
@@ -74,6 +82,9 @@ const Header = () => {
                     ) : (
                         <Link href="/login" className="text-gray-700 hover:text-blue-600 font-medium transition">Login</Link>
                     )}
+                    <AuthContextProvider>
+                        <LogoutButton />
+                    </AuthContextProvider>
                 </div>
 
                 {/* Mobile Menu Toggle */}

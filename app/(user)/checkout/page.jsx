@@ -5,7 +5,7 @@ import { useUser } from '@/lib/firestore/user/read'
 import { CircularProgress } from '@mui/material'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import React from 'react'
+
 import Checkout from './components/Checkout'
 
 function page() {
@@ -55,12 +55,12 @@ function page() {
             quantity: 1,
             product: products[0]
         }
-    ] : data?.carts?.map((item) => {
-        return {
-            ...item,
-            product: products?.find((e) => e?.id === item?.id)
-        }
-    })
+    ] : data?.carts?.map((item) => ({
+        ...item,
+        product: products?.find((e) => e?.id === item?.id),
+        key: item.id  // Adding a unique key here
+    }));
+
 
     return (
         <main className="p-5 flex flex-col gap-4 min-h-screen pb-16">

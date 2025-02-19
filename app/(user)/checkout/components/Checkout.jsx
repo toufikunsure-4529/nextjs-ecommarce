@@ -37,29 +37,29 @@ export default function Checkout({ productList }) {
             if (!address?.fullName || !address?.mobile || !address?.addressLine1) {
                 throw new Error("Please Fill All Address Details");
             }
-
             if (!productList || productList?.length === 0) {
                 throw new Error("Product List Is Empty");
             }
-
             if (paymentMode === "prepaid") {
                 throw new Error("Online Payment Option Not Available");
-
             } else {
                 const checkoutId = await createCheckoutCODAndGetId({
                     uid: user?.uid,
                     products: productList,
                     address: address,
                 });
-                router.push(`/checkout-cod?checkout_id=${checkoutId}`);
-                toast.success("Successfully Placed!");
+
+                // Show loading while navigating
+                toast.success("Successfully Placed! Redirecting...");
                 confetti();
+                router.push(`/checkout-cod?checkout_id=${checkoutId}`);
             }
         } catch (error) {
             toast.error(error?.message);
         }
         setIsLoading(false);
     };
+
 
     if (isLoading) {
         return (
@@ -180,9 +180,9 @@ export default function Checkout({ productList }) {
                 <section className="flex flex-col gap-3 border rounded-xl p-4">
                     <h1 className="text-xl">Products</h1>
                     <div className="flex flex-col gap-2">
-                        {productList?.map((item) => {
+                        {productList?.map((item, index) => {
                             return (
-                                <div className="flex gap-3 items-center" key={item?.product?.title}>
+                                <div className="flex gap-3 items-center" key={index}>
                                     <img
                                         className="w-10 h-10 object-cover rounded-lg"
                                         src={item?.product?.featureImageURL}
