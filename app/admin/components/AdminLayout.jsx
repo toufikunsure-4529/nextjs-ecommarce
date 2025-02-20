@@ -1,12 +1,13 @@
 "use client"
 
-;
+    ;
 import Sidebar from './Sidebar';
 import AdminHeader from './Header';
 import { useAuth } from '@/context/AuthContext';
 import { useAdmin } from "@/lib/firestore/admins/read";
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { CircularProgress } from '@mui/material';
 
 
 function AdminLayout({ children }) {
@@ -15,13 +16,11 @@ function AdminLayout({ children }) {
 
     if (isLoading) {
         return (
-            <div className="h-screen w-screen flex justify-center items-center">
-                <div className="flex flex-col gap-2 justify-center items-center">
-                    <div className="animate-pulse rounded-full h-12 w-12 border-b-2 border border-blue-500"></div>
-                    <p className="text-lg font-bold text-gray-600">Loading...</p>
-                </div>
+            <div className="h-screen w-full flex flex-col justify-center items-center bg-gray-100">
+                <CircularProgress size={50} thickness={4} color="primary" />
+                <p className="mt-4 text-gray-600 font-medium">Please Wait...</p>
             </div>
-        )
+        );
     }
 
 

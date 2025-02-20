@@ -1,12 +1,13 @@
-import { getProduct } from '@/lib/firestore/products/read_server';
-;
+import { getProduct } from '@/lib/firestore/products/read_server';;
 import Photos from './components/Photos';
 import Details from './components/Details';
 import Description from './components/Description';
 import Reviews from './components/Reviews';
 import RelatedProducts from './components/RelatedProducts';
+import AddReview from './components/AddReview';
+import { AuthContextProvider } from '@/context/AuthContext';
 
-async function page({ params }) {
+export default async function Page({ params }) {
     const { productId } = params;
     const product = await getProduct({ id: productId });
 
@@ -22,17 +23,21 @@ async function page({ params }) {
                 {/* Right: Product Details */}
                 <div>
                     <Details product={product} />
+                    <Description product={product} />
+
                 </div>
             </section>
 
-            {/* Description & Reviews Section */}
-            <section>
-                <Description product={product} />
-            </section>
-            {/* Prodcuts Review Section */}
-            <section>
-                <Reviews productId={product} />
-            </section>
+
+
+            <div className='flex  justify-center items-center py-10'>
+                <div className='flex flex-col md:flex-row gap-4 md:max-w-4xl w-full'>
+                    <AuthContextProvider>
+                        <AddReview productId={product} />
+                        <Reviews productId={product} />
+                    </AuthContextProvider>
+                </div>
+            </div>
 
             {/* Related Products Section */}
             <section className="mt-10">
@@ -42,4 +47,3 @@ async function page({ params }) {
     );
 }
 
-export default page;

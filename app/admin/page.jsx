@@ -1,7 +1,12 @@
 "use client"
-;
+    ;
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Bell, Menu, ShoppingCart, Package, Users, DollarSign } from 'lucide-react';
+import Link from 'next/link';
+import { useUsers } from '@/lib/firestore/user/read';
+import { useAllOrders } from '@/lib/firestore/orders/read';
+import { useState } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const salesData = [
     { month: 'Jan', sales: 4000 },
@@ -72,7 +77,25 @@ const recentOrders = [
     </div>
 </div>
 export default function Dashboard() {
+    const [pageLimit, setPageLimit] = useState(999);
+    const [lastSnapDocList, setLastSnapDocList] = useState([]);
+    const { data: users = [], error, isLoading } = useUsers(); // Ensure users is always an array
+    const {
+        data: orders = [],
+        lastSnapDoc,
+    } = useAllOrders({
+        pageLimit,
+        lastSnapDoc: lastSnapDocList.length === 0 ? null : lastSnapDocList[lastSnapDocList.length - 1],
+    });
 
+    if (isLoading) {
+        return (
+            <div className="h-screen w-full flex flex-col justify-center items-center bg-gray-100">
+                <CircularProgress size={50} thickness={4} color="primary" />
+                <p className="mt-4 text-gray-600 font-medium">Fetching Data...</p>
+            </div>
+        );
+    }
     return (
         <div className="min-h-screen bg-gray-100">
 
@@ -92,15 +115,17 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-sm">
-                            <div className="flex items-center">
-                                <ShoppingCart className="h-8 w-8 text-blue-500 mr-3" />
-                                <div>
-                                    <p className="text-gray-500">Total Orders</p>
-                                    <p className="text-2xl font-bold">1,234</p>
+                        <Link href={"/admin/orders"}>
+                            <div className="bg-white p-6 rounded-lg shadow-sm">
+                                <div className="flex items-center">
+                                    <ShoppingCart className="h-8 w-8 text-blue-500 mr-3" />
+                                    <div>
+                                        <p className="text-gray-500">Total Orders</p>
+                                        <p className="text-2xl font-bold">{orders.length}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                         <div className="bg-white p-6 rounded-lg shadow-sm">
                             <div className="flex items-center">
                                 <Package className="h-8 w-8 text-purple-500 mr-3" />
@@ -110,15 +135,16 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-sm">
-                            <div className="flex items-center">
-                                <Users className="h-8 w-8 text-red-500 mr-3" />
-                                <div>
-                                    <p className="text-gray-500">Total Customers</p>
-                                    <p className="text-2xl font-bold">890</p>
+                        <Link href={"/admin/customers"}>
+                            <div className="bg-white p-6 rounded-lg shadow-sm">
+                                <div className="flex items-center">
+                                    <Users className="h-8 w-8 text-red-500 mr-3" />
+                                    <div>
+                                        <p className="text-gray-500">Total Customers</p>
+                                        <p className="text-2xl font-bold">{users.length}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div></Link>
                     </div>
 
                     {/* Charts Section */}

@@ -1,12 +1,12 @@
-"use client"
 
 import { Rating } from "@mui/material";
 import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { Suspense } from "react";
 import FavoriteButton from "./FavoriteButton";
 import { AuthContextProvider } from "@/context/AuthContext";
 import AddToCartButton from "./AddToCartButton";
+import { getProductReviewCounts } from "@/lib/firestore/products/count/read";
 
 function ProductsGridView({ products }) {
     const mockProducts = [
@@ -100,10 +100,10 @@ export function ProductCard({ product }) {
                         <h2 className="text-lg font-bold text-green-500">₹{product.salePrice}</h2>
                         <span className="text-sm font-semibold text-gray-600 line-through">₹{product.price}</span>
                     </div>
-                    <div className=" flex gap-3 items-center">
-                        <Rating name="product-rating" defaultValue={2.5} precision={0.5} size="small" readOnly />
-                        <h2 className=" text-xs text-gray-400"> (0)</h2>
-                    </div>
+
+                    <Suspense>
+                        <RatingReview product={product} />
+                    </Suspense>
                 </Link>
 
                 <div className="flex justify-between gap-3 mt-auto">
@@ -123,4 +123,15 @@ export function ProductCard({ product }) {
             </div>
         </div>
     );
+}
+
+
+async function RatingReview({ product }) {
+    const counts = await getProductReviewCounts({ productId: product?.id })
+    return (
+        <div className=" flex gap-3 items-center">
+            <Rating name="product-rating" defaultValue={counts?.averageRating ?? 0} precision={0.5} size="small" readOnly />
+            <h2 className=" text-xs text-gray-400"> <span>{counts?.averageRating?.toFixed(2)}</span> ({counts?.totalReviews}) Reviews</h2>
+        </div>
+    )
 }

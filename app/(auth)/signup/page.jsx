@@ -2,15 +2,20 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase';
+import { createUser } from '@/lib/firestore/user/write';
+import { CircularProgress } from '@mui/material';
+import { Button } from '@nextui-org/react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 export default function Signup() {
     const { user } = useAuth();
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         if (user) {
@@ -24,15 +29,31 @@ export default function Signup() {
         formState: { errors },
     } = useForm();
 
-    const onSubmit = async (data) => {
+    const handleSignup = async (data) => {
+        setIsLoading(true)
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-            await updateProfile(userCredential.user, { displayName: data.name });
-            console.log('User registered:', userCredential.user);
-            router.push('/');
+            // signup API call
+            const credential = await createUserWithEmailAndPassword(auth, data?.email, data?.password);
+            console.log(credential)
+            await updateProfile(credential.user, {
+                displayName: data?.name,
+            })
+            const user = credential.user;
+            await createUser({
+                uid: user?.uid,
+                displayName: data?.name,
+                mobileNo: data?.mobile,
+                email: data?.email,
+                gender: data?.gender,
+                country: data?.country,
+                photoURL: user?.photoURL,
+            })
+            toast.success("Signup Successfully")
+            router.push('/account')
         } catch (error) {
-            console.error(error.message);
+            toast.error(error?.message);
         }
+        setIsLoading(false)
     };
 
     return (
@@ -46,7 +67,7 @@ export default function Signup() {
             <div className="w-full md:w-3/4 lg:w-2/3 flex justify-center items-center p-6">
                 <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-lg">
                     <h2 className="text-2xl font-semibold text-black mb-6 text-center">Sign Up</h2>
-                    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <form onSubmit={handleSubmit(handleSignup)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Name Field */}
                         <div>
                             <label className="block text-sm font-medium text-black">Full Name</label>
@@ -129,12 +150,15 @@ export default function Signup() {
                         {errors.agree && <p className="text-red-500 text-sm md:col-span-2">{errors.agree.message}</p>}
 
                         {/* Signup Button */}
-                        <button
+                        <Button
                             type="submit"
-                            className="md:col-span-2 w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition shadow-md"
+                            isDisabled={isLoading}
+                            className={`md:col-span-2 w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition shadow-md ${isLoading ? "bg-gray-400 cursor-not-allowed" : ""}`}
                         >
                             Sign Up
-                        </button>
+                            {isLoading && <CircularProgress size={20} thickness={7} color="primary" />
+                            }
+                        </Button>
                     </form>
                     {/* Already have an account? */}
                     <div className="text-sm text-black text-center mt-4">

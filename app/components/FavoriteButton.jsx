@@ -1,3 +1,5 @@
+"use client";
+
 import { useAuth } from "@/context/AuthContext"
 import { useUser } from "@/lib/firestore/user/read"
 import { updateFavorites } from "@/lib/firestore/user/write"

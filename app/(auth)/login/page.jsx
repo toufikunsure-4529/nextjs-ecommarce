@@ -2,6 +2,8 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase';
+import { useAdmin } from '@/lib/firestore/admins/read';
+import { createUser } from '@/lib/firestore/user/write';
 import { CircularProgress } from '@mui/material';
 import { Button } from '@nextui-org/react';
 import {
@@ -12,12 +14,17 @@ import {
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { FcGoogle } from 'react-icons/fc';
 
 
 export default function Login() {
   const { user } = useAuth()
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+
+
+
   useEffect(() => {
     if (user) {
       router.push("/account")
@@ -29,14 +36,21 @@ export default function Login() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const handleLogin = async (data) => {
+    setIsLoading(true)
+    try {
+      await signInWithEmailAndPassword(auth, data?.email, data?.password)
+      toast.success("Logged In Successfully")
+    } catch (error) {
+      toast.error(error?.message)
+    }
+    setIsLoading(false)
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 ">
       {/* Left side for desktop */}
-      <div className="hidden md:flex w-1/2 bg-black text-white justify-center items-center">
+      <div className="hidden md:flex w-1/2 bg-black text-white justify-center items-center ">
         <h1 className="text-4xl font-bold">Welcome Back!</h1>
       </div>
 
@@ -44,7 +58,7 @@ export default function Login() {
       <div className="w-full md:w-1/2 flex justify-center items-center p-6">
         <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-lg ">
           <h2 className="text-2xl font-semibold text-black mb-6 text-center">Login</h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-black">Email</label>
@@ -69,17 +83,20 @@ export default function Login() {
 
             {/* Forgot Password & Sign Up Links */}
             <div className="flex justify-between text-sm text-black">
-              <Link href="" className="hover:underline">Forgot Password?</Link>
+              <Link href="/forget-password" className="hover:underline">Forgot Password?</Link>
               <Link href="/signup" className="hover:underline">Don't have an account? Sign Up</Link>
             </div>
 
             {/* Login Button */}
-            <button
+            <Button
               type="submit"
-              className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition shadow-md"
+              className={`w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition shadow-md  ${isLoading ? "bg-gray-400 cursor-not-allowed" : ""}`}
+              isDisabled={isLoading}
             >
               Login
-            </button>
+              {isLoading && <CircularProgress size={20} thickness={7} color="primary" />}
+
+            </Button>
             {/* Divider */}
             <div className="flex items-center my-4">
               <div className="flex-grow border-t border-gray-300"></div>
@@ -100,26 +117,34 @@ export default function Login() {
 function SignInWithGoogleComponents() {
   const [loading, setIsLoading] = useState(false)
   const handleLogin = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const credential = await signInWithPopup(auth, new GoogleAuthProvider())
+      const credential = await signInWithPopup(auth, new GoogleAuthProvider());
       const user = credential.user;
+      console.log("credential", credential)
+      console.log(user)
       await createUser({
         uid: user?.uid,
-        displayName: user?.displayName,
-        photoURL: user?.photoURL,
+        displayName: user?.displayName ?? "",
+        mobileNo: user?.phoneNumber ?? "",
+        email: user?.email ?? "",
+        gender: user?.gender ?? "",
+        country: user?.country ?? "",
+        photoURL: user?.photoURL ?? "",
       });
+      toast.success("Logged In Successfully");
     } catch (error) {
-      console.log(error.message)
+      toast.error(error.message);
+      console.log(error);
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (<Button
     type="button"
     className={`w-full flex items-center justify-center border  py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-200 transition-all shadow-md ${loading ? "bg-gray-200 cursor-not-allowed" : ""}`}
     onClick={handleLogin}
-    disabled={loading}
+    isDisabled={loading}
 
   >
 
