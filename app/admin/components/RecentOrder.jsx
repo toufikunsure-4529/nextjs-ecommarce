@@ -12,8 +12,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function ListView() {
-    const [pageLimit, setPageLimit] = useState(10);
+export default function RecentOrder() {
+    const [pageLimit, setPageLimit] = useState(5);
     const [lastSnapDocList, setLastSnapDocList] = useState([]);
 
     useEffect(() => {
@@ -71,23 +71,6 @@ export default function ListView() {
                 </tbody>
             </table>
 
-            <div className="flex justify-between items-center py-4">
-                <Button isDisabled={isLoading || lastSnapDocList.length === 0} onClick={handlePrePage} size="sm" variant="bordered">
-                    Previous
-                </Button>
-                <select
-                    value={pageLimit}
-                    onChange={(e) => setPageLimit(Number(e.target.value))}
-                    className="px-4 py-2 rounded-md border border-gray-300"
-                >
-                    {[3, 5, 10, 20, 100].map((value) => (
-                        <option key={value} value={value}>{value} Items</option>
-                    ))}
-                </select>
-                <Button isDisabled={isLoading || orders?.length === 0} onClick={handleNextPage} size="sm" variant="bordered">
-                    Next
-                </Button>
-            </div>
         </div>
     );
 }
