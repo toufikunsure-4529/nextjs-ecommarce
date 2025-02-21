@@ -9,6 +9,7 @@ import {
   query,
   startAfter,
   where,
+  getDocs
 } from "firebase/firestore";
 import useSWRSubscription from "swr/subscription";
 
@@ -101,3 +102,33 @@ export function useProductsByIds({ idsList }) {
     isLoading: data === undefined,
   };
 }
+
+
+export const searchProducts = async (searchTerm) => {
+  if (!searchTerm.trim()) return [];
+
+  const ref = collection(db, "products");
+
+  const queries = [
+    query(ref, where("title", ">=", searchTerm), where("title", "<=", searchTerm + "\uf8ff")),
+    query(ref, where("shortDescription", ">=", searchTerm), where("shortDescription", "<=", searchTerm + "\uf8ff")),
+    query(ref, where("description", ">=", searchTerm), where("description", "<=", searchTerm + "\uf8ff")),
+    query(ref, where("featureImageURL", ">=", searchTerm), where("featureImageURL", "<=", searchTerm + "\uf8ff"))
+  ];
+
+  try {
+    const results = await Promise.all(queries.map(getDocs));
+
+    const products = new Map();
+    results.forEach((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        products.set(doc.id, { id: doc.id, ...doc.data() });
+      });
+    });
+
+    return Array.from(products.values());
+  } catch (error) {
+    console.error("Error searching products:", error);
+    return [];
+  }
+};

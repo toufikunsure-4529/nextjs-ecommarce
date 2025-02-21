@@ -1,12 +1,11 @@
 
-import { Rating } from "@mui/material";
-import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import React, { Suspense } from "react";
 import FavoriteButton from "./FavoriteButton";
 import { AuthContextProvider } from "@/context/AuthContext";
 import AddToCartButton from "./AddToCartButton";
 import { getProductReviewCounts } from "@/lib/firestore/products/count/read";
+import MyRating from "./MyRating";
 
 function ProductsGridView({ products }) {
     const mockProducts = [
@@ -78,8 +77,13 @@ function ProductsGridView({ products }) {
 export default ProductsGridView;
 
 export function ProductCard({ product }) {
+    const isOutOfStock = product?.stock <= (product?.orders ?? 0);
+
     return (
-        <div className="border border-gray-200 bg-white shadow-md rounded-lg overflow-hidden min-h-[360px] flex flex-col transition hover:shadow-lg">
+        <div
+            className={`border border-gray-200 bg-white shadow-md rounded-lg overflow-hidden min-h-[360px] flex flex-col transition hover:shadow-lg ${isOutOfStock ? " filter grayscale opacity-80 pointer-events-none" : ""
+                }`}
+        >
             <div className="relative w-full">
                 <img
                     src={product.featuredImageURL}
@@ -88,13 +92,15 @@ export function ProductCard({ product }) {
                 />
                 <div className="absolute top-1 right-1">
                     <AuthContextProvider>
-
                         <FavoriteButton productId={product?.id} />
                     </AuthContextProvider>
                 </div>
             </div>
             <div className="p-4 flex flex-col flex-grow gap-2">
-                <Link href={`/products/${product?.id}`}><h3 className="text-base font-semibold text-gray-900 line-clamp-2 hover:text-blue-500 transition-colors delay-100">{product.title}</h3>
+                <Link href={`/products/${product?.id}`}>
+                    <h3 className="text-base font-semibold text-gray-900 line-clamp-2 hover:text-blue-500 transition-colors delay-100">
+                        {product.title}
+                    </h3>
                     <p className="text-xs text-gray-500 line-clamp-2">{product.shortDescription}</p>
                     <div className="flex gap-2 items-center">
                         <h2 className="text-lg font-bold text-green-500">₹{product.salePrice}</h2>
@@ -106,18 +112,21 @@ export function ProductCard({ product }) {
                     </Suspense>
                 </Link>
 
+                {isOutOfStock && (
+                    <div className="flex mt-3">
+                        <h3 className="text-red-500 bg-red-50 py-1 px-2 rounded-lg text-sm">Out of Stock</h3>
+                    </div>
+                )}
+
                 <div className="flex justify-between gap-3 mt-auto">
                     <Link href={`/checkout?type=buynow&productId=${product?.id}`}>
                         <button className="bg-blue-500 text-white flex-1 py-2 px-4 text-sm font-medium rounded-lg transition hover:bg-blue-600 shadow-md">
                             Buy Now
                         </button>
                     </Link>
-                    {/* <button className="bg-gray-100 text-gray-700 p-2 rounded-lg transition hover:bg-gray-200 shadow-md">
-                        <ShoppingCart className="w-5 h-5" />
-                    </button> */}
+
                     <AuthContextProvider>
                         <AddToCartButton productId={product?.id} />
-
                     </AuthContextProvider>
                 </div>
             </div>
@@ -126,11 +135,12 @@ export function ProductCard({ product }) {
 }
 
 
+
 async function RatingReview({ product }) {
     const counts = await getProductReviewCounts({ productId: product?.id })
     return (
         <div className=" flex gap-3 items-center">
-            <Rating name="product-rating" defaultValue={counts?.averageRating ?? 0} precision={0.5} size="small" readOnly />
+            <MyRating value={counts?.averageRating ?? 0} />
             <h2 className=" text-xs text-gray-400"> <span>{counts?.averageRating?.toFixed(2)}</span> ({counts?.totalReviews}) Reviews</h2>
         </div>
     )

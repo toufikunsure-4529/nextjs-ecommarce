@@ -1,28 +1,10 @@
-"use client"
-    ;
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Bell, Menu, ShoppingCart, Package, Users, DollarSign } from 'lucide-react';
-import Link from 'next/link';
-import { useUsers } from '@/lib/firestore/user/read';
-import { useAllOrders } from '@/lib/firestore/orders/read';
-import { useState } from 'react';
-import { CircularProgress } from '@mui/material';
+"use client";
 
-const salesData = [
-    { month: 'Jan', sales: 4000 },
-    { month: 'Feb', sales: 3000 },
-    { month: 'Mar', sales: 5000 },
-    { month: 'Apr', sales: 2780 },
-    { month: 'May', sales: 1890 },
-    { month: 'Jun', sales: 2390 },
-];
-
-const stockData = [
-    { product: 'Shirts', stock: 45 },
-    { product: 'Shoes', stock: 85 },
-    { product: 'Hats', stock: 25 },
-    { product: 'Bags', stock: 35 },
-];
+import CountMeter from './components/CountMeter';
+import RevenueChart from './components/RevenueChart';
+import OrdersChart from './components/OrdersChart';
+import { useOrdersCountsByTotalDays } from '@/lib/firestore/orders/read_count';
+import { useEffect, useState } from 'react';
 
 const recentOrders = [
     { id: '#1234', customer: 'John Doe', amount: '$235', status: 'Delivered' },
@@ -32,138 +14,31 @@ const recentOrders = [
 ];
 
 
-
-<div className="bg-white rounded-lg shadow-sm overflow-hidden">
-    <div className="md:p-6 p-0">
-        <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-        <div className="overflow-x-auto">
-            <table className="w-full">
-                <thead>
-                    <tr className="text-left text-gray-500 border-b">
-                        <th className="pb-3">Order ID</th>
-                        <th className="pb-3">Customer</th>
-                        <th className="pb-3">Amount</th>
-                        <th className="pb-3">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {recentOrders.map((order) => (
-                        <tr key={order.id} className="border-b last:border-b-0">
-                            <td className="py-4">{order.id}</td>
-                            <td className="py-4">{order.customer}</td>
-                            <td className="py-4">{order.amount}</td>
-                            <td className="py-4">
-                                <span
-                                    className={`px-3 py-1 rounded-full text-sm ${order.status === "Delivered"
-                                        ? "bg-green-100 text-green-800"
-                                        : order.status === "Processing"
-                                            ? "bg-red-100 text-red-800"
-                                            : order.status === "Shipped"
-                                                ? "bg-blue-100 text-blue-800"
-                                                : order.status === "Cancelled"
-                                                    ? "bg-yellow-100 text-yellow-800"
-                                                    : "bg-gray-100 text-gray-800"
-                                        }`}
-                                >
-                                    {order.status}
-                                </span>
-                            </td>
-
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 export default function Dashboard() {
-    const [pageLimit, setPageLimit] = useState(999);
-    const [lastSnapDocList, setLastSnapDocList] = useState([]);
-    const { data: users = [], error, isLoading } = useUsers(); // Ensure users is always an array
-    const {
-        data: orders = [],
-        lastSnapDoc,
-    } = useAllOrders({
-        pageLimit,
-        lastSnapDoc: lastSnapDocList.length === 0 ? null : lastSnapDocList[lastSnapDocList.length - 1],
-    });
+    const [dates, setDates] = useState([]);
+    useEffect(() => {
+        let list = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            list.push(date);
+        }
+        setDates(list);
+    }, []);
 
-    if (isLoading) {
-        return (
-            <div className="h-screen w-full flex flex-col justify-center items-center bg-gray-100">
-                <CircularProgress size={50} thickness={4} color="primary" />
-                <p className="mt-4 text-gray-600 font-medium">Fetching Data...</p>
-            </div>
-        );
-    }
+    const { data } = useOrdersCountsByTotalDays({ dates: dates });
+
     return (
         <div className="min-h-screen bg-gray-100">
-
 
             {/* Main Content */}
             <div>
                 <div className="px-4 py-6 sm:px-6 lg:px-8">
 
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-lg shadow-sm">
-                            <div className="flex items-center">
-                                <DollarSign className="h-8 w-8 text-green-500 mr-3" />
-                                <div>
-                                    <p className="text-gray-500">Total Sales</p>
-                                    <p className="text-2xl font-bold">$24,500</p>
-                                </div>
-                            </div>
-                        </div>
-                        <Link href={"/admin/orders"}>
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <div className="flex items-center">
-                                    <ShoppingCart className="h-8 w-8 text-blue-500 mr-3" />
-                                    <div>
-                                        <p className="text-gray-500">Total Orders</p>
-                                        <p className="text-2xl font-bold">{orders.length}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                        <div className="bg-white p-6 rounded-lg shadow-sm">
-                            <div className="flex items-center">
-                                <Package className="h-8 w-8 text-purple-500 mr-3" />
-                                <div>
-                                    <p className="text-gray-500">Total Products</p>
-                                    <p className="text-2xl font-bold">567</p>
-                                </div>
-                            </div>
-                        </div>
-                        <Link href={"/admin/customers"}>
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <div className="flex items-center">
-                                    <Users className="h-8 w-8 text-red-500 mr-3" />
-                                    <div>
-                                        <p className="text-gray-500">Total Customers</p>
-                                        <p className="text-2xl font-bold">{users.length}</p>
-                                    </div>
-                                </div>
-                            </div></Link>
-                    </div>
-
-                    {/* Charts Section */}
-                    <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-semibold mb-4">Sales Trend</h3>
-                            <div className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={salesData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="month" />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Line type="monotone" dataKey="sales" stroke="#4f46e5" />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
+                    <CountMeter />
+                    <div className=' flex gap-5 flex-col md:flex-row mb-6'>
+                        <RevenueChart items={data} />
+                        <OrdersChart items={data} />
                     </div>
 
                     {/* Recent Orders Table */}

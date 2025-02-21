@@ -3,6 +3,20 @@ import { getCategory } from '@/lib/firestore/categories/read_server';
 import { getProductsByCategory } from '@/lib/firestore/products/read_server';
 
 
+export async function generateMetadata({ params }) {
+    const { categoryId } = params;
+    const category = await getCategory({ id: categoryId })
+
+    return {
+        title: `${category?.name} | Category` ?? "E Commarce category",
+        description: category?.name ?? "",
+        openGraph: {
+            images: [collection?.imageURL],
+        },
+    };
+}
+
+
 async function page({ params }) {
     const { categoryId } = params;
     const category = await getCategory({ id: categoryId })
